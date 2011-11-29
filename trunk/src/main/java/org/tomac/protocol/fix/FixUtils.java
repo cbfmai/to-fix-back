@@ -7,8 +7,6 @@ import org.tomac.utils.Utils;
 
 public class FixUtils {
 	
-	private final static boolean useNasdaqOmx = Boolean.getBoolean("useNasdaq");
-	
 	public final static int UTCTIMESTAMP_LENGTH = 21; // yyyyMMdd-HH:mm:ss.SSS
 	public final static int CURRENCY_LENGTH = 3;
 	public final static int FIX_MAX_STRING_LENGTH = 32;
@@ -23,14 +21,25 @@ public class FixUtils {
 	public static final int FIX_FLOAT_NUMBER_OF_DECIMALS_DIGITS = 4;
 	public static final int FIX_MAX_DIGITS = 24;
 	public static byte[] digitsBuf = new byte[FIX_MAX_DIGITS];
-	private static byte[] newMsgType = new byte[2];
 	
 	public final static byte[] EXECUTIONREPORT = "8".getBytes(); // ascii for '8'
 	public final static byte[] ORDERCANCELREJECT = "9".getBytes(); // ascii for '9'
 	public final static int EXECUTIONREPORT_INT = 56; // ascii for '8'
 	public final static int ORDERCANCELREJECT_INT = 57; // ascii for '9'
-	private static final byte[] EXECTYPE_SCAN = "\u0001150=".getBytes();
-	private static final byte[] CXLREJRESPONSETO_SCAN = "\u0001434=".getBytes();
+    private static final byte[] MIN_VALUE = "-9223372036854775808".getBytes();
+    private static final byte[] buf = new byte[FIX_MAX_DIGITS];
+
+    static byte[][] TAGS = new byte[500][];
+
+    static{
+        for (int i =0; i< TAGS.length; i++) {
+        	int len = Utils.digits(i) + 1;
+            ByteBuffer buffer = ByteBuffer.allocate(len);
+            put(buffer, i);
+            put(buffer, EQL);
+            TAGS[i] = buffer.array();
+        }
+    }
 
 	public static class SessionRejectReason {
 		public static final long UNDEFINED_TAG = 3;
@@ -187,7 +196,7 @@ public class FixUtils {
 			
 		return dst;
 	}
-	
+
 	public static boolean isSet(final byte[] val) {
 		return val[0] != (byte)0;
 	}	
@@ -209,12 +218,11 @@ public class FixUtils {
 		int cks = 0;
 		int i = end - start;
 		
-		buf.position(start);
-		
-		while (i > 0)
+//		buf.position(start);
+        byte[] array = buf.array();
+        for (i=start; i<end; i++)
 		{
-			i--;
-			cks += buf.get();
+			cks += array[i];
 		}
 		
         return ( cks % 256 );
@@ -310,9 +318,12 @@ public class FixUtils {
 		
 		longToFixFloat(digitsBuf, 0, value, length);
 		
-		put(buf, tag);
-		
-		buf.put( EQL );
+        if (tag >= TAGS.length) {
+            put(buf, tag);
+            buf.put(EQL);
+        }else {
+            buf.put(TAGS[tag]);
+        }
 		
 		put(buf, digitsBuf);
 			
@@ -322,9 +333,12 @@ public class FixUtils {
 
 	public static void putFixTag(final ByteBuffer buf, final int tag, final byte value) {
 
-		put(buf, tag);
-		
-		buf.put( EQL );
+        if (tag >= TAGS.length) {
+            put(buf, tag);
+            buf.put(EQL);
+        }else {
+            buf.put(TAGS[tag]);
+        }
 		
 		buf.put(value);
 			
@@ -338,9 +352,12 @@ public class FixUtils {
 
 	public static void putFixTag(final ByteBuffer buf, final int tag, final byte[] value) {
 
-		put(buf, tag);
-		
-		buf.put( EQL );
+        if (tag >= TAGS.length) {
+            put(buf, tag);
+            buf.put(EQL);
+        }else {
+            buf.put(TAGS[tag]);
+        }
 		
 		put(buf, value);
 			
@@ -350,9 +367,12 @@ public class FixUtils {
 
 	public static void putFixTag(final ByteBuffer buf, final int tag, long value) {
 
-		put(buf, tag);
-		
-		buf.put( EQL );
+        if (tag >= TAGS.length) {
+            put(buf, tag);
+            buf.put(EQL);
+        }else {
+            buf.put(TAGS[tag]);
+        }
 		
 		if( value < 0 ) {
 
@@ -369,9 +389,12 @@ public class FixUtils {
 
 	public static void putFixTag(final ByteBuffer buf, final int tag, final byte[] value, final int offset, final int end) {
 
-		put(buf, tag);
-		
-		buf.put( EQL );
+        if (tag >= TAGS.length) {
+            put(buf, tag);
+            buf.put(EQL);
+        }else {
+            buf.put(TAGS[tag]);
+        }
 		
 		buf.put(value, offset, end);
 			
@@ -385,16 +408,16 @@ public class FixUtils {
 	}
 
 	static void put(final ByteBuffer out, final byte[] buf) {
+        int i=0;
 		for (final byte b : buf) {
 			if (b == SOH || b == 0)
 				break;
+            i++;
 
-			out.put(b);
 		}
+        out.put(buf, 0, i);
 	}
 
-	private static final byte[] MIN_VALUE = "-9223372036854775808".getBytes();
-	private static final byte[] buf = new byte[FIX_MAX_DIGITS];
 
 	static void put(final ByteBuffer out, long i) {
 
