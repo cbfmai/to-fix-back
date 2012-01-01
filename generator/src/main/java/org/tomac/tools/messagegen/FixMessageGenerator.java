@@ -599,7 +599,7 @@ public class FixMessageGenerator {
 
 		// ensure the directory exists
 		if (!packageDir.exists())
-			packageDir.mkdir();
+			packageDir.mkdirs();
 		else
 			// delete all the old files
 			for (final File f : packageDir.listFiles(new FilenameFilter() {
