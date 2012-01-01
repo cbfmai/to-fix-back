@@ -133,10 +133,10 @@ public class TestFixContainerSession {
 	
 	/**
 	 * What constitutes a garbled message
-	 * •	BeginString (tag #8) is not the first tag in a message or is not of the format 8=FIXT.n.m.
-	 * •	BodyLength (tag #9) is not the second tag in a message or does not contain the correct byte count.
-	 * •	MsgType (tag #35) is not the third tag in a message.
-	 * •	Checksum (tag #10) is not the last tag or contains an incorrect value.
+	 * 	BeginString (tag #8) is not the first tag in a message or is not of the format 8=FIXT.n.m.
+	 * 	BodyLength (tag #9) is not the second tag in a message or does not contain the correct byte count.
+	 * 	MsgType (tag #35) is not the third tag in a message.
+	 * 	Checksum (tag #10) is not the last tag or contains an incorrect value.
 	 * If the MsgSeqNum(tag #34) is missing a logout message should be sent terminating the FIX Connection, 
 	 * as this indicates a serious application error that is likely only circumvented by software modification.
 	 */
