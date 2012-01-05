@@ -51,7 +51,7 @@ public class TestParseFixStream {
 	public void setUp() throws Exception {
 		flipByteArray = new byte[FIX_MAX_MESSAGE_LENGTH];
 		readByteArray = new byte[FIX_MAX_MESSAGE_LENGTH];
-		buf = ByteBuffer.allocate(FIX_MAX_MESSAGE_LENGTH + FIX_MAX_MESSAGE_LENGTH);
+		buf = ByteBuffer.allocateDirect(FIX_MAX_MESSAGE_LENGTH + FIX_MAX_MESSAGE_LENGTH);
 		parser = new FixMessageParser();
 		listener = new FixMessageListenerImpl();
 		System.setProperty("fix.raw", "true");
@@ -137,7 +137,7 @@ public class TestParseFixStream {
 				msg.getAll();
 
 				if (Boolean.getBoolean("fix.raw")) {
-					ByteBuffer out = ByteBuffer.allocate(1024);
+					ByteBuffer out = ByteBuffer.allocateDirect(1024);
 					msg.encode(out);
 					byte[] outArray = new byte[out.limit()];
 					//msg.buf.position(0);

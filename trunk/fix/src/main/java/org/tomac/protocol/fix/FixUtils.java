@@ -33,11 +33,11 @@ public class FixUtils {
 
     static{
         for (int i =0; i< TAGS.length; i++) {
-        	int len = Utils.digits(i) + 1;
-            ByteBuffer buffer = ByteBuffer.allocate(len);
-            put(buffer, i);
-            put(buffer, EQL);
-            TAGS[i] = buffer.array();
+            int len = Utils.digits(i) + 1;
+            byte[] buffer = new byte[len];
+            Utils.longToNumeric(buffer, 0, len - 1, (long)i, len - 1);
+            buffer[len-1] = EQL;
+            TAGS[i] = buffer;
         }
     }
 
@@ -218,14 +218,17 @@ public class FixUtils {
 		int cks = 0;
 		int i = end - start;
 		
-//		buf.position(start);
-        byte[] array = buf.array();
-        for (i=start; i<end; i++)
-		{
-			cks += array[i];
-		}
+		int pos = buf.position();
 		
-        return ( cks % 256 );
+		buf.position(start);
+		
+		while (i>0) {
+		    cks += buf.get();
+		    i--;
+		}
+		buf.position(pos);
+		
+		return ( cks % 256 );
 	}
 	
 	public static void longToFixFloat(final byte out[], final int offset, long l, int length) {
@@ -518,5 +521,5 @@ public class FixUtils {
 		}
 		
 	}
-	
+
 }
