@@ -118,7 +118,7 @@ public class TestFixContainers {
 			if (outMsg instanceof FixLogon) 
 				assertTrue(((FixLogon)outMsg).toString().length() > 0);
 
-			ByteBuffer out = ByteBuffer.allocate(1024);
+			ByteBuffer out = ByteBuffer.allocateDirect(1024);
 			try {
 				outMsg.encode(out);
 			} catch (Exception e) {
@@ -154,7 +154,7 @@ public class TestFixContainers {
 
 			assertTrue (outMsg instanceof FixExecutionReport || outMsg instanceof FixTradeCaptureReport);
 
-			ByteBuffer out = ByteBuffer.allocate(1024);
+			ByteBuffer out = ByteBuffer.allocateDirect(1024);
 			try {
 				outMsg.encode(out);
 			} catch (Exception e) {

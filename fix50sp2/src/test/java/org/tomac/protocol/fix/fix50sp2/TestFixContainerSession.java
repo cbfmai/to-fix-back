@@ -32,8 +32,8 @@ public class TestFixContainerSession {
 	public void setUp() throws Exception {
 		FixMessage.IGNORE_CHECKSUM = false;
 		
-		buf = ByteBuffer.allocate(1024);
-		out = ByteBuffer.allocate(1024);
+		buf = ByteBuffer.allocateDirect(1024);
+		out = ByteBuffer.allocateDirect(1024);
 		
 		msg = new FixExecutionReport();
 		msg2 = new FixExecutionReport();

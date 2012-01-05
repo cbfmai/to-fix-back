@@ -27,7 +27,7 @@ import org.tomac.utils.Utils;
 public class TestMessages {
 	FixMessageListenerTest listener = new FixMessageListenerTest();
 	FixMessageParser parser;
-	ByteBuffer out = ByteBuffer.allocate(1024);
+	ByteBuffer out = ByteBuffer.allocateDirect(1024);
 	
 	@Before
 	public void setUp() {
