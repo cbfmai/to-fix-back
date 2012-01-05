@@ -168,4 +168,33 @@ public class TestFixUtils {
 		
 	}
 	
+	@Test 
+	public void testComputCheckSum() {
+	    byte[] array = "12345678901234567890".getBytes();
+	    ByteBuffer buf = ByteBuffer.wrap(array);
+	    int cks = 0;
+	    
+	    for (byte b : array) {
+		cks += b;
+	    }
+	    int expected = cks % 256;
+	    
+	    int actual = FixUtils.computeChecksum(buf, 0, array.length);
+	    
+	    assertEquals(expected, actual);
+	    
+	    array = "1234567890123456".getBytes();
+	    buf = ByteBuffer.wrap(array);
+	    cks = 0;
+	    
+	    for (byte b : array) {
+		cks += b;
+	    }
+	    expected = cks % 256;
+	    
+	    actual = FixUtils.computeChecksum(buf, 0, array.length);
+	    
+	    assertEquals(expected, actual);
+
+	}
 }

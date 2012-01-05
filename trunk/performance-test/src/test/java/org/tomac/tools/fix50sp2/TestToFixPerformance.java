@@ -33,8 +33,8 @@ public class TestToFixPerformance {
 	@Before
 	public void setUp() {
 		tmp = new byte[1024];
-		out = ByteBuffer.allocateDirect(1024);
-		buf = ByteBuffer.allocateDirect(1024);
+		out = ByteBuffer.allocate(1024);
+		buf = ByteBuffer.allocate(1024);
 		parser = new FixMessageParser();
 		listener = new FixMessageListener() {
     		@Override
@@ -741,13 +741,13 @@ public class TestToFixPerformance {
 		System.out.println(sampleTime / sampleCount + "\t" + 
 				sampleCount * DO_SAMPLE_DATA + "\t" + cumTime / ITERATIONS + "\t" + ITERATIONS);
 	}	
-	
+
     @Test
     public void testOutBoundLatencyOrderEntry() throws Exception {
 		ByteBuffer buf = ByteBuffer.wrap("8=FIXT.1.1\u00019=241\u000135=D\u000149=SenderCompId\u000156=TargetCompId\u000134=37\u000152=20070223-22:28:33\u000111=1833\u000138=1\u000140=2\u000144=12\u000154=2\u000155=BHP\u000148=BHP\u000159=1\u000160=20060223-22:38:33\u0001526=3620\u000178=2\u000179=AllocACC180=1010.1\u000179=AllocACC2\u000180=2020.2\u0001453=2\u0001448=8\u0001447=D\u0001452=4\u0001448=AAA35354\u0001447=D\u0001452=3\u000110=089\u0001".getBytes());
         
     	parser.parse(buf, listener);
-        ByteBuffer out = ByteBuffer.allocateDirect(1024);
+        ByteBuffer out = ByteBuffer.allocate(1024);
 
         int count = 0;
         long cumTime = 0L;
@@ -784,7 +784,7 @@ public class TestToFixPerformance {
     	ByteBuffer buf = ByteBuffer.wrap("8=FIXT.1.1\u00019=155\u000135=W\u000134=2\u000149=ABFX\u000152=20080722-16:37:11.234\u000156=X2RV1\u00155=EUR/USD\u0001262=CAP00000112\u0001268=2\u0001269=1\u0001270=1.5786\u0001271=500000\u0001272=20080724\u0001269=1\u0001271=500000\u0001272=20080724\u000110=218\u0001".getBytes());
         
     	parser.parse(buf, listener);
-        ByteBuffer out = ByteBuffer.allocateDirect(1024);
+        ByteBuffer out = ByteBuffer.allocate(1024);
 
         int count = 0;
         long cumTime = 0L;

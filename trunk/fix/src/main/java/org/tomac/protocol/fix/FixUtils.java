@@ -213,22 +213,34 @@ public class FixUtils {
 		return val;
 	}
 
-	public static int computeChecksum( final ByteBuffer buf, final int start, final int end )
-	{
+	public static int computeChecksum(final ByteBuffer buf, final int start,
+			final int end) {
 		int cks = 0;
 		int i = end - start;
-		
-		int pos = buf.position();
-		
-		buf.position(start);
-		
-		while (i>0) {
-		    cks += buf.get();
-		    i--;
+
+		if (buf.hasArray()) {
+
+			byte[] array = buf.array();
+			for (i = start; i < end; i++) {
+				cks += array[i];
+			}
+
+		} else {
+
+			int pos = buf.position();
+
+			buf.position(start);
+
+			while (i > 0) {
+				cks += buf.get();
+				i--;
+
+			}
+
+			buf.position(pos);
 		}
-		buf.position(pos);
-		
-		return ( cks % 256 );
+
+		return (cks % 256);
 	}
 	
 	public static void longToFixFloat(final byte out[], final int offset, long l, int length) {
