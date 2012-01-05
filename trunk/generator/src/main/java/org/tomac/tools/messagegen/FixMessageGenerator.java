@@ -1194,7 +1194,6 @@ public class FixMessageGenerator {
  		out.write("\t\t// assumption message is full otherwise decode would return null\n");
  		out.write("\t\t// so negative id means that we are at the end of the message\n");
  		out.write("\t\tint id;\n");
- 		out.write("\t\tint lastTagPosition = buf.position();\n");
  		out.write("\t\twhile ( ( id = FixUtils.getTagId( buf ) ) >= 0 )\n");
  		out.write("\t\t{\n");
  		out.write("\t\t\t" + strReadableByteBuffer + " value;\n\n");
@@ -1240,12 +1239,8 @@ public class FixMessageGenerator {
 
  		out.write("\t\t\tdefault:\n");
 		out.write("\t\t\t\tthrow new FixSessionException(SessionRejectReason.UNDEFINED_TAG, \"Unknown tag\".getBytes(), id, FixUtils.getMsgType(msgTypeInt) );\n\n");
- 		// for components -> out.write("\t\t\t\tbuf.position( lastTagPosition );\n\n");
- 		//out.write("\t\t\t\treturn;\n\n");
 
  		out.write("\t\t\t}\n\n");
-
- 		out.write("\t\t\tlastTagPosition = buf.position();\n\n");
 
 		out.write("\t\t}\n\n");
 
@@ -1597,7 +1592,8 @@ public class FixMessageGenerator {
 			out.write("\tpublic void getAll(int id, " + strReadableByteBuffer + " buf) throws FixSessionException, FixGarbledException\n");
 		out.write("\t{\n\n");
 
- 		out.write("\t\tint startTagPosition = buf.position();\n\n");
+		if (!m.isRepeating) 
+		    out.write("\t\tint startTagPosition = buf.position();\n\n");
 
  		if (m.isRepeating) out.write("\t\tint id = FixUtils.getTagId( buf );\n");
  		out.write("\t\tint lastTagPosition = buf.position();\n");
