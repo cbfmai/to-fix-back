@@ -170,6 +170,7 @@ public class TestFixContainerSession {
 	/**
 	 * BeginString value (e.g. "FIX.4.2") received did not match value expected and specified in 
 	 * testing profile or does not match BeginString on outbound messages.
+	 * Note: expected test result should be session reject (e.g.g logout). Not compliant with FIX Session specification,
 	 */
 	@Test
 	public void test2i_InvalidBeginString() {
@@ -192,9 +193,9 @@ public class TestFixContainerSession {
 			
 			fail("In msg is invalid: " + new String(msgByteArray));
 		} catch( FixSessionException e )  {
-			assertEquals(SessionRejectReason.VALUE_IS_INCORRECT_OUT_OF_RANGE_FOR_THIS_TAG, e.sessionRejectReason);
-		} catch( FixGarbledException e ) {
 			fail(e.getMessage());
+		} catch( FixGarbledException e ) {
+			assertTrue(e.getMessage(), e.getMessage().startsWith("First tag in FIX message is not BEGINSTRING (8)"));
 		}		
 	}
 	

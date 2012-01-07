@@ -63,22 +63,68 @@ public class FixUtils {
 	 */
 	public static int getTagId( final ByteBuffer out ) throws FixGarbledException
 	{
-		out.mark();
-		
 		int x = 0;
-		byte b = 0;
 
-		try {
-			while ((b = out.get() ) != EQL) {
-
-				x *= 10;
-
-				x += b - '0';
-
-			}
+		if (out.hasArray()) {
+			int t0 = 0;
+			int t1 = 0;
+			int t2 = 0;
+			int t3 = 0;
+			int t4 = 0;
+			int i = out.position();
+			
+			if (out.array()[i] != EQL) {
+				t0 = out.array()[i] - '0';
+				if (out.array()[++i] != EQL) {
+					t1 = out.array()[i] - '0';
+					if (out.array()[++i] != EQL) {
+						t2 = out.array()[i] - '0';
+						if (out.array()[++i] != EQL) {
+							t3 = out.array()[i] - '0';
+							if (out.array()[++i] != EQL) {
+								t4 = out.array()[i] - '0';
+								if (out.array()[++i] != EQL) {
+									throw new FixGarbledException(out, "Tag not terminated by \'=\' or exceding 5");
+								} else {
+									x = t4 + t3 * 10 + t2 * 100 + t1 * 1000 + t0 * 10000;
+								}
+							} else {
+								x = t3 + t2 * 10 + t1 * 100 + t0 * 1000;
+							}
+						} else {
+							x = t2 + t1 * 10 + t0 * 100;
+						}
+					} else {
+						x = t1 + t0 * 10;
+					}
+				} else {
+					x = t0;
+				}					
+			} else {
+				throw new FixGarbledException(out, "Tag with no value");
+			}			
+			out.position(++i);
 			return x;
-		} catch (final BufferUnderflowException e) {
-			throw new FixGarbledException(out, "Tag not terminated by \'=\' or exceding " + FIX_MAX_DIGITS);
+		} else {
+
+			out.mark();
+
+			byte b = 0;
+
+			try {
+				while ((b = out.get()) != EQL) {
+
+					x *= 10;
+
+					x += b - '0';
+
+				}
+				return x;
+			} catch (final BufferUnderflowException e) {
+				throw new FixGarbledException(out,
+						"Tag not terminated by \'=\' or exceding "
+								+ FIX_MAX_DIGITS);
+			}
 		}
 	}
 
@@ -189,6 +235,7 @@ public class FixUtils {
 				dst[start] = c;
 				start++;
 			}
+				
 		}
 		
 		if (start == 0)
@@ -494,18 +541,24 @@ public class FixUtils {
 		out.put(buf, 0, size);
 	}
 
-	public static int getMsgTypeTagAsInt(final byte[] b, final int length) {
+	public static int getMsgTypeTagAsInt(final byte[] b, final int start, final int length) {
 		int val = 0;
 
-		val |= b[0];
+		val |= b[start];
 
 		if (length > 1)
-			for (int i = 1; i < length; i++) {
+			for (int i = start + 1; i < start + length; i++) {
 				val <<= 8;
 				val |= b[i];
 			}
 
 		return val;
+	}	
+
+	public static int getMsgTypeTagAsInt(final byte[] b, final int length) {
+
+		return getMsgTypeTagAsInt(b,0,length);
+		
 	}	
 	
 	public static byte[] getMsgType(final int msgType) {

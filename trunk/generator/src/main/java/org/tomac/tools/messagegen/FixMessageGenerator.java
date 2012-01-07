@@ -761,7 +761,15 @@ public class FixMessageGenerator {
 		out.write("\t\n");
 		out.write("\tprivate static byte[] tmpMsgType = new byte[4];\n");
 		out.write("\tprivate static byte[] tmpBeginString = new byte[BEGINSTRING_VALUE.length];\n\n");
-
+		final String servicepack = Integer.valueOf(dom.major) > 4 ? "SP" + dom.servicepack : "";
+		if (Integer.valueOf(dom.major) < 5) {
+			out.write("\tpublic static final byte[] tmpFixedLengthHeader = \"8=" + dom.type.toUpperCase() + "." + dom.major + "." + dom.minor + servicepack + "\u00019=....\u000135=..\u0001\".getBytes();\n");
+			out.write("\tpublic static final byte[] FIXED_LENGTH_HEADER = \"8=" + dom.type.toUpperCase() + "." + dom.major + "." + dom.minor + servicepack + "\u00019=\".getBytes();\n");
+		} else {
+			out.write("\tpublic static final byte[] tmpFixedLengthHeader = \"8=FIXT.1.1\u00019=....\u000135=..\u0001\".getBytes();\n");
+			out.write("\tpublic static final byte[] FIXED_LENGTH_HEADER = \"8=FIXT.1.1\u00019=\".getBytes();\n");
+		}
+		
 		out.write("\t/**\n");
 		out.write("\t * crackMsgType performs a garbled check on the fix message. \n");
 		out.write("\t * @param data\n");
@@ -909,82 +917,65 @@ public class FixMessageGenerator {
 
 	private void genGetMsgType(FixMessageDom dom, BufferedWriter out, boolean isCrackMsgType) throws Exception 
 	{
-		if (isCrackMsgType) 
+		if(isCrackMsgType) {
+			out.write("\t\tstartPos = buf.position();\n\n");
+			
 			out.write("\t\ttry {\n");
-		out.write("\t\tstartPos = buf.position();\n");
+			out.write("\t\tbuf.get(tmpFixedLengthHeader);\n");
+			out.write("\t\tif (Utils.equals(FIXED_LENGTH_HEADER, tmpFixedLengthHeader)) {\n");
+			out.write("\t\t	for (int i = FIXED_LENGTH_HEADER.length; i<tmpFixedLengthHeader.length; i++) {\n");
+			out.write("\t\t		if(tmpFixedLengthHeader[i]==SOH) {\n");
+			out.write("\t\t			int bodyLength = Utils.intValueOf(tmpFixedLengthHeader, FIXED_LENGTH_HEADER.length, i-FIXED_LENGTH_HEADER.length);\n");
+			out.write("\t\t			int checkSumBegin = startPos + i + 1 + bodyLength;\n");
+			out.write("\t\t			if (tmpFixedLengthHeader[++i]=='3'&&tmpFixedLengthHeader[++i]=='5'&&tmpFixedLengthHeader[++i]=='=') {\n");
+			out.write("\t\t				int tagLen = tmpFixedLengthHeader[i+2] == SOH ? 1 : (tmpFixedLengthHeader[i+3] == SOH ? 2 : 0);\n");
+			out.write("\t\t				msgTypeInt = FixUtils.getMsgTypeTagAsInt(tmpFixedLengthHeader, ++i, tagLen);\n");
+			out.write("\t\t			} else {\n");
+			out.write("\t\t				throw new FixGarbledException(buf, \"Third tag in FIX message is not MSGTYPE (35)\");\n");
+			out.write("\t\t			}\n");
+			out.write("\t\t			try {\n");
+			out.write("\t\t				if(checkSumBegin > buf.limit())\n");
+			out.write("\t\t					return -1; // signal that buffer is to short.\n");
+			out.write("\t\t				buf.position(checkSumBegin);\n");
+			out.write("\t\t			} catch (IllegalArgumentException e) {\n");
+			out.write("\t\t				throw new FixGarbledException(buf, \"Invalid BODYLENGTH (9) value: \" + bodyLength);\n");		
+			out.write("\t\t			}\n");
+			out.write("\t\t			int tagId = FixUtils.getTagId(buf);\n");
+			out.write("\t\t			if(tagId != FixTags.CHECKSUM_INT)\n");
+			out.write("\t\t				throw new FixGarbledException(buf, \"Final tag in FIX message is not CHECKSUM (10)\");\n\n");
 
-		out.write("\t\tif(buf.remaining() < (FixMessageInfo.BEGINSTRING_VALUE_WITH_TAG.length + 1 /* SOH */ + 5 /* 9=00SOH */) )\n");
-		out.write("\t\t\tthrow new FixGarbledException(buf, \"Message too short to contain mandatory header tags\");\n\n");
-
-		out.write("\t\tint begin = buf.position();\n\n");
-
-		out.write("\t\tint tagId = FixUtils.getTagId(buf);\n");
-		out.write("\t\tif(tagId != FixTags.BEGINSTRING_INT)\n");
-		out.write("\t\t\tthrow new FixGarbledException(buf, \"First tag in FIX message is not BEGINSTRING (8)\");\n\n");
-
-		out.write("\t\tFixUtils.getTagStringValue(null, FixTags.BEGINSTRING_INT, buf, tmpBeginString);\n");
-		if (!isCrackMsgType) {
-			out.write("\t\tif(!Utils.equals(FixMessageInfo.BEGINSTRING_VALUE, tmpBeginString))\n");
-			out.write("\t\t	throw new FixSessionException(SessionRejectReason.VALUE_IS_INCORRECT_OUT_OF_RANGE_FOR_THIS_TAG, (\"BeginString not equal to: \" + new String(FixMessageInfo.BEGINSTRING_VALUE)).getBytes(), FixTags.BEGINSTRING_INT, new byte[0]);");
-		}
-		
-		out.write("\t\t//now look to get bodyLength field\n");
-		out.write("\t\ttagId = FixUtils.getTagId(buf);\n");
-		out.write("\t\tif(tagId != FixTags.BODYLENGTH_INT)\n");
-		out.write("\t\t\tthrow new FixGarbledException(buf, \"Second tag in FIX message is not BODYLENGTH (9)\");\n\n");
-
-		out.write("\t\tint bodyLength = FixUtils.getTagIntValue(null, FixTags.BODYLENGTH_INT, buf);\n");
-		out.write("\t\tif(bodyLength < 0)\n\n");
-		out.write("\t\t	throw new FixGarbledException(buf, \"Invalid BODYLENGTH (9) value: \" + bodyLength);\n\n");
-		
-		out.write("\t\tint checkSumBegin = buf.position() + bodyLength; \n");
-
-		out.write("\t\tif(checkSumBegin > buf.limit()) \n\n");
-		if (isCrackMsgType) 
-			out.write("\t\t\treturn -1; // signal that buffer is to short.\n");
-		else
-			out.write("\t\t\tthrow new FixGarbledException(buf, \"Message too short to contain mandatory checksum\");\n\n");
-
-		out.write("\t\t//FIRST, validate that we got a msgType field\n");
-		out.write("\t\ttagId = FixUtils.getTagId(buf);\n");
-		out.write("\t\tif(tagId != FixTags.MSGTYPE_INT)\n");
-		out.write("\t\t	throw new FixGarbledException(buf, \"Third tag in FIX message is not MSGTYPE (35)\");\n\n");
-
-		out.write("\t\tFixUtils.getTagStringValue(null, FixTags.MSGTYPE_INT, buf, tmpMsgType);\n\n");
-		if (!isCrackMsgType)
-			out.write("\t\tmsgTypeEnd = buf.position();\n\n");
-
-		out.write("\t\t//we should verify that the final tag IS checksum here if we want to\n");
-		out.write("\t\tbuf.position(checkSumBegin);\n");
-		out.write("\t\ttagId = FixUtils.getTagId(buf);\n");
-		out.write("\t\tif(tagId != FixTags.CHECKSUM_INT)\n");
-		out.write("\t\t	throw new FixGarbledException(buf, \"Final tag in FIX message is not CHECKSUM (10)\");\n\n");
-
-		out.write("\t\tcheckSum = FixUtils.getTagIntValue(tmpMsgType, FixTags.CHECKSUM_INT, buf);\n");
-		if (isCrackMsgType) {
-			out.write("\t\tint calculatedCheckSum = FixUtils.computeChecksum(buf, begin, checkSumBegin);\n");
-			out.write("\t\tif(checkSum != calculatedCheckSum && !IGNORE_CHECKSUM)\n");
-			out.write("\t\t	throw new FixGarbledException(buf, String.format(\"Checksum mismatch; calculated: %s is not equal message checksum: %s\", calculatedCheckSum, checkSum));\n\n");
-		}
-		out.write("\t\t// finish-up\n");
-		//if (isCrackMsgType) 
-		//	out.write("\t\tbuf.flip();\n\n");
-		
-		out.write("\t\tbuf.position(startPos);\n\n");
-
-		out.write("\t\tmsgTypeInt = FixUtils.getMsgTypeTagAsInt(tmpMsgType, Utils.lastIndexTrim(tmpMsgType, (byte)0));\n\n");
-		
-		if (!isCrackMsgType) {
-			out.write("\t\tif (! MsgType.isValid(tmpMsgType))\n");
-			out.write("\t\t\tthrow new FixSessionException(SessionRejectReason.INVALID_MSGTYPE, \"MsgType not in specificaton for tag\".getBytes(), FixTags.MSGTYPE_INT, FixUtils.getMsgType(msgTypeInt) );");
-		}
-		
-		if (isCrackMsgType) {
+			out.write("\t\t			checkSum = FixUtils.getTagIntValue(tmpMsgType, FixTags.CHECKSUM_INT, buf);\n");
+			out.write("\t\t			int calculatedCheckSum = FixUtils.computeChecksum(buf, startPos, checkSumBegin);\n");
+			out.write("\t\t			if(checkSum != calculatedCheckSum && !IGNORE_CHECKSUM)\n");
+			out.write("\t\t				throw new FixGarbledException(buf, String.format(\"Checksum mismatch; calculated: %s is not equal message checksum: %s\", calculatedCheckSum, checkSum));\n");
+			out.write("\t\t			break;\n");
+			out.write("\t\t		}\n");
+			out.write("\t\t	}\n");
+			out.write("\t\t} else {\n");
+			out.write("\t\t	throw new FixGarbledException(buf, \"First tag in FIX message is not BEGINSTRING (8)\");\n");
+			out.write("\t\t}\n");
 			out.write("\t\t} catch (FixSessionException e) {\n");
-			out.write("\t\t\tthrow new FixGarbledException(buf, e.getMessage());\n");
+			out.write("\t\t	throw new FixGarbledException(buf, e.getMessage());\n");
 			out.write("\t\t} catch (NumberFormatException e) {\n");
-			out.write("\t\t\tthrow new FixGarbledException(buf, e.getMessage());\n");
+			out.write("\t\t	throw new FixGarbledException(buf, e.getMessage());\n");
 			out.write("\t\t}\n\n");
+			
+			out.write("\t\t// finish-up\n");
+			out.write("\t\tbuf.position(startPos);	\n");		
+		} else {
+			out.write("\t\tstartPos = buf.position();\n");
+			out.write("\t\t// we know that the fixed header is correctly formated, as the garbled check has been done in crackMsgType call.\n");
+			out.write("\t\tbuf.get(tmpFixedLengthHeader);\n");
+			out.write("\t\tfor (int i=0; i<tmpFixedLengthHeader.length; i++) {\n");
+			out.write("\t\t	if (tmpFixedLengthHeader[i] == SOH && tmpFixedLengthHeader[i+1] == '3' && tmpFixedLengthHeader[i+2] == '5' && tmpFixedLengthHeader[i+3] == EQUALS ) {\n");
+			out.write("\t\t		tmpMsgType[0] = tmpFixedLengthHeader[i+4];\n");
+			out.write("\t\t		tmpMsgType[1] = tmpFixedLengthHeader[i+5] != SOH ? tmpFixedLengthHeader[i+5] : (byte)' ';\n");
+			out.write("\t\t		if (! MsgType.isValid(tmpMsgType))\n");
+			out.write("\t\t			throw new FixSessionException(SessionRejectReason.INVALID_MSGTYPE, \"MsgType not in specificaton for tag\".getBytes(), FixTags.MSGTYPE_INT, tmpMsgType );		// assumption message is full otherwise decode would return null\n");
+			out.write("\t\t		msgTypeEnd = startPos + i + 3 + (tmpFixedLengthHeader[i+5] == SOH ? 3 : 4);\n");
+			out.write("\t\t		break;\n");
+			out.write("\t\t	}\n");
+			out.write("\t\t}\n");
 		}
 	}
 
