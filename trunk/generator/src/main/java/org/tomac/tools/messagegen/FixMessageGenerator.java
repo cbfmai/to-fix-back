@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.SortedSet;
 
 import org.dom4j.Document;
@@ -16,10 +15,31 @@ import org.tomac.tools.messagegen.FixMessageDom.DomFixComponentRef;
 import org.tomac.tools.messagegen.FixMessageDom.DomFixField;
 import org.tomac.tools.messagegen.FixMessageDom.DomFixField.DomFixValue;
 import org.tomac.tools.messagegen.FixMessageDom.DomFixMessage;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 
 
-public class FixMessageGenerator {
+/**
+ * Generate FIX Messages.
+ * @goal java
+ */
+public class FixMessageGenerator extends AbstractMojo {
+
+	/**
+     * The FIX Specification file.
+     *
+     * @parameter expression="${generator.fixspecfile}" default-value="FIX50SP2.xml"
+     */
+	private String fixspecfile;
 	
+	/**
+     * The generated sources directory.
+     *
+     * @parameter expression="${generator.generatedsourcedir}" default-value="${project.build.directory}/generated-sources/fix"
+     */
+	private String generatedsourcedir;
+
 	// static include strings, allowing for cahnging the import libraries.
 	private static String strInByteBuffer = "import java.nio.ByteBuffer;";
 	private static String strOutByteBuffer = "";
@@ -65,30 +85,26 @@ public class FixMessageGenerator {
 
 		return val;
 	}
-
-	public static void main(final String[] args) {
-		
-		if (args.length < 1) {
-			System.out.println("Usage: FixMessageGenerator [specFile] [outputDirectory]");
-			System.out.println("specFile:\tthe quickFix xml file.\noutputDirectory:\tthe java src root.\n");
-			return;
-		} 
-
-		final File specFile = new File(args[0]);
+	
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		final File specFile = new File(fixspecfile);
 
 		if (!specFile.exists()) {
-			System.out.println("Spec file " + args[0] + " cannot be found!");
+			System.out.println("Spec file " + fixspecfile + " cannot be found!");
 
 			return;
 		}
 
-		File outputDir = new File(System.getProperty("user.dir"));
-
-		if (args.length > 1) {
-			outputDir = new File(args[1]);
+		File outputDir;
+		
+		if (generatedsourcedir != null && generatedsourcedir.length() > 0) {
+			outputDir = new File(generatedsourcedir);
 
 			if (!outputDir.exists())
 				outputDir.mkdirs();
+		} else {
+			outputDir = new File(System.getProperty("user.dir"));
 		}
 		
 		FixMessageDom fixDom = null;
@@ -104,42 +120,6 @@ public class FixMessageGenerator {
 			return;
 		}
 		
-		/*if (prettyformat) {
-			new FixMessageGenerator().prettyformat(fixDom);
-			return;
-		}*/
-		// print missing fields.
-		if (args.length > 2) {
-			final File refFile = new File(args[2]);
-			try {
-				FixMessageDom refFixDom = fixLoadAndValidate(refFile);
-				Iterator<String> it = fixDom.missingFields.iterator();
-				while (it.hasNext()) {
-					String name = it.next();
-					DomFixField field = refFixDom.domFixNamedFields.get(name);
-					if (field!=null) {
-						if (field.domFixValues.size()==0) {
-							System.out.println("<field name=\""+field.name+"\" number=\""+field.number+"\" type=\""+field.type+"\"/>");
-						} else {
-							System.out.println("<field name=\""+field.name+"\" number=\""+field.number+"\" type=\""+field.type+"\">");
-							Iterator<DomFixValue> iv = field.domFixValues.iterator();
-							while (iv.hasNext()) {
-								DomFixValue v = iv.next();
-								System.out.println("\t<value enum=\"" + v.fixEnum + "\" description=\"" + v.description + "\"/>");
-							}
-							System.out.println("</field>");
-						}
-					}
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-				return;
-			}
-			
-		}		
-
-
-		
 		try {
 			new FixMessageGenerator().generate(fixDom, outputDir);
 		} catch (final Exception e) {
@@ -151,6 +131,33 @@ public class FixMessageGenerator {
 		}
 
 		System.out.println("Done.");
+	}
+
+	public static void main(final String[] args) throws MojoExecutionException, MojoFailureException {
+		
+		if (args.length < 1) {
+			System.out.println("Usage: FixMessageGenerator [specFile] [outputDirectory]");
+			System.out.println("specFile:\tthe quickFix xml file.\noutputDirectory:\tthe java src root.\n");
+			return;
+		} 
+		
+		FixMessageGenerator fixMessageGenerator = new FixMessageGenerator();
+
+		fixMessageGenerator.setFixSpecFile(args[0]);
+		
+		if (args.length > 1) {
+			fixMessageGenerator.setGeneratedSourceDir(args[1]);
+		}
+
+		fixMessageGenerator.execute();
+	}
+
+	private void setFixSpecFile(String arg) {
+		fixspecfile = new String(arg);
+	}
+
+	private void setGeneratedSourceDir(String arg) {
+		generatedsourcedir = new String(arg);		
 	}
 
 	static String uncapFirst(final String s) {
@@ -2207,5 +2214,6 @@ public class FixMessageGenerator {
 			// TODO Auto-generated method stub
 			
 	}
+
 	
 }
