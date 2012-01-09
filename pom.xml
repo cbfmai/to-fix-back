@@ -23,9 +23,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:svn:http://to-fix/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://to-fix/svn/trunk/</developerConnection>
-		<url>http://to-fix/svn/trunk</url>
+		<connection>scm:svn:http://to-fix.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://to-fix.googlecode.com/svn/trunk/</developerConnection>
+		<url>http://code.google.com/p/to-fix/</url>
 	</scm>
 	<developers>
 		<developer>
