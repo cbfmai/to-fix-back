@@ -35,7 +35,7 @@ public class FixUtils {
         for (int i =0; i< TAGS.length; i++) {
             int len = Utils.digits(i) + 1;
             byte[] buffer = new byte[len];
-            Utils.longToNumeric(buffer, 0, len - 1, (long)i, len - 1);
+            Utils.longToNumeric(buffer, 0, len - 1, (long) i, len - 1);
             buffer[len-1] = EQL;
             TAGS[i] = buffer;
         }
@@ -72,18 +72,19 @@ public class FixUtils {
 			int t3 = 0;
 			int t4 = 0;
 			int i = out.position();
-			
-			if (out.array()[i] != EQL) {
-				t0 = out.array()[i] - '0';
-				if (out.array()[++i] != EQL) {
-					t1 = out.array()[i] - '0';
-					if (out.array()[++i] != EQL) {
-						t2 = out.array()[i] - '0';
-						if (out.array()[++i] != EQL) {
-							t3 = out.array()[i] - '0';
-							if (out.array()[++i] != EQL) {
-								t4 = out.array()[i] - '0';
-								if (out.array()[++i] != EQL) {
+
+            byte[] array = out.array();
+            if (array[i] != EQL) {
+				t0 = array[i] - '0';
+				if (array[++i] != EQL) {
+					t1 = array[i] - '0';
+					if (array[++i] != EQL) {
+						t2 = array[i] - '0';
+						if (array[++i] != EQL) {
+							t3 = array[i] - '0';
+							if (array[++i] != EQL) {
+								t4 = array[i] - '0';
+								if (array[++i] != EQL) {
 									throw new FixGarbledException(out, "Tag not terminated by \'=\' or exceding 5");
 								} else {
 									x = t4 + t3 * 10 + t2 * 100 + t1 * 1000 + t0 * 10000;
