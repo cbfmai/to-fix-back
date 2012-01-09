@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 
 	<name>to-fix</name>
-	<description>FIX 5.0SP2 Message Containers based on the FIX Repository (from fixprotocol.org) to QuickFix formatted XML.</description>
+	<description>FIX Protocol Message Containers - Lightweight low latency message encoder/decoder</description>
 	<url>http://www.tomac.org</url>
 	<licenses>
 		<license>
@@ -27,7 +27,14 @@
 		<developerConnection>scm:svn:https://to-fix/svn/trunk/</developerConnection>
 		<url>http://to-fix/svn/trunk</url>
 	</scm>
-
+	<developers>
+		<developer>
+			<id>seto</id>
+			<name>Sebastian Tomac</name>
+			<email>sebastian.tomac@gmail.com</email>
+		</developer>
+	</developers>
+      
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -66,5 +73,5 @@
 		<module>fix50sp2</module>
 		<module>fix42nordic</module>
 		<module>performance-test</module>
-	</modules>
+  </modules>
 </project>
