@@ -8,7 +8,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>generator</artifactId>
+	<artifactId>generator-maven-plugin</artifactId>
 	<!--packaging>jar</packaging-->
 	<packaging>maven-plugin</packaging>
 
