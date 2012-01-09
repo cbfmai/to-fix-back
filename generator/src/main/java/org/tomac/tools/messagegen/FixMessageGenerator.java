@@ -18,6 +18,7 @@ import org.tomac.tools.messagegen.FixMessageDom.DomFixMessage;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
 
 
 /**
@@ -56,7 +57,15 @@ public class FixMessageGenerator extends AbstractMojo {
 	private static String strUtil = "Utils";
 	private static String strOtherUtil = "Utils";
 
-	
+    /**
+     * The current Maven project.
+     *
+     * @parameter default-value="${project}"
+     * @readonly
+     * @required
+     */
+    protected MavenProject project;
+
 	private static String capFirst(final String s) {
 		return s.substring(0, 1).toUpperCase() + s.substring(1);
 	}
@@ -122,6 +131,7 @@ public class FixMessageGenerator extends AbstractMojo {
 		
 		try {
 			new FixMessageGenerator().generate(fixDom, outputDir);
+            project.addCompileSourceRoot(outputDir.getAbsolutePath());
 		} catch (final Exception e) {
 			System.out.println("Failure: " + e);
 
