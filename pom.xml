@@ -9,7 +9,7 @@
 
 	<groupId>org.tomac</groupId>
 	<artifactId>to-fix</artifactId>
-	<version>1.0</version>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>to-fix</name>
@@ -23,9 +23,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:svn:http://to-fix.googlecode.com/svn/tags/to-fix-1.0</connection>
-		<developerConnection>scm:svn:https://to-fix.googlecode.com/svn/tags/to-fix-1.0</developerConnection>
-		<url>http://code.google.com/p/to-fix/tags/to-fix-1.0</url>
+		<connection>scm:svn:http://to-fix.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://to-fix.googlecode.com/svn/trunk/</developerConnection>
+		<url>http://code.google.com/p/to-fix/</url>
 	</scm>
 	<developers>
 		<developer>
@@ -54,7 +54,7 @@
 				<plugin>
 					<groupId>org.tomac</groupId>
                     <artifactId>generator-maven-plugin</artifactId>
-					<version>1.0</version>
+					<version>1.0-SNAPSHOT</version>
 					<executions>
 						<execution>
 							<goals>
