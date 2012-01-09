@@ -958,14 +958,16 @@ public class FixMessageGenerator extends AbstractMojo {
 			out.write("\t\t			} catch (IllegalArgumentException e) {\n");
 			out.write("\t\t				throw new FixGarbledException(buf, \"Invalid BODYLENGTH (9) value: \" + bodyLength);\n");		
 			out.write("\t\t			}\n");
-			out.write("\t\t			int tagId = FixUtils.getTagId(buf);\n");
-			out.write("\t\t			if(tagId != FixTags.CHECKSUM_INT)\n");
-			out.write("\t\t				throw new FixGarbledException(buf, \"Final tag in FIX message is not CHECKSUM (10)\");\n\n");
+            out.write("\t\t			if(!IGNORE_CHECKSUM){\n");
+            out.write("\t\t			    int tagId = FixUtils.getTagId(buf);\n");
+			out.write("\t\t			    if(tagId != FixTags.CHECKSUM_INT)\n");
+			out.write("\t\t				    throw new FixGarbledException(buf, \"Final tag in FIX message is not CHECKSUM (10)\");\n\n");
 
-			out.write("\t\t			checkSum = FixUtils.getTagIntValue(tmpMsgType, FixTags.CHECKSUM_INT, buf);\n");
-			out.write("\t\t			int calculatedCheckSum = FixUtils.computeChecksum(buf, startPos, checkSumBegin);\n");
-			out.write("\t\t			if(checkSum != calculatedCheckSum && !IGNORE_CHECKSUM)\n");
-			out.write("\t\t				throw new FixGarbledException(buf, String.format(\"Checksum mismatch; calculated: %s is not equal message checksum: %s\", calculatedCheckSum, checkSum));\n");
+			out.write("\t\t			    checkSum = FixUtils.getTagIntValue(tmpMsgType, FixTags.CHECKSUM_INT, buf);\n");
+			out.write("\t\t			    int calculatedCheckSum = FixUtils.computeChecksum(buf, startPos, checkSumBegin);\n");
+			out.write("\t\t			    if(checkSum != calculatedCheckSum && !IGNORE_CHECKSUM)\n");
+			out.write("\t\t				    throw new FixGarbledException(buf, String.format(\"Checksum mismatch; calculated: %s is not equal message checksum: %s\", calculatedCheckSum, checkSum));\n");
+			out.write("\t\t			}\n");
 			out.write("\t\t			break;\n");
 			out.write("\t\t		}\n");
 			out.write("\t\t	}\n");
