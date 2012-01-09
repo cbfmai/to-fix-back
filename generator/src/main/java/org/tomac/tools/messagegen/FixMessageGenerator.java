@@ -23,7 +23,8 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * Generate FIX Messages.
- * @goal java
+ * @goal generate
+ * @phase generate-sources
  */
 public class FixMessageGenerator extends AbstractMojo {
 

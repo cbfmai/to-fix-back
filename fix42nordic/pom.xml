@@ -29,7 +29,7 @@
         <plugins>
             <plugin>
                 <groupId>org.tomac</groupId>
-                <artifactId>generator</artifactId>
+                <artifactId>generator-maven-plugin</artifactId>
                 <configuration>
 	                <fixspecfile>${project.basedir}/../repository/FIX42Nordic.xml</fixspecfile>
                 </configuration>
