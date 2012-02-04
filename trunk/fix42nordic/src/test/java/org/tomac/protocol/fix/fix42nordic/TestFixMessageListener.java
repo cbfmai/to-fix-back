@@ -5,6 +5,8 @@
  **/
 package org.tomac.protocol.fix.fix42nordic;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.tomac.protocol.fix.messaging.FixExecutionReport;
 import org.tomac.protocol.fix.messaging.FixHeartbeat;
 import org.tomac.protocol.fix.messaging.FixLogon;
@@ -27,6 +29,10 @@ import org.tomac.protocol.fix.messaging.FixTestRequest;
  *
  */
 public class TestFixMessageListener implements FixMessageListener {
+
+        @Ignore
+        @Test
+        public void testDummeBecauseSurefireOrIamStupid() {}
 
 	@Override
 	public void onUnknownMessageType(FixMessage msg) {
