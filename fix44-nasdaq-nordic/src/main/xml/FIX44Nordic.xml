@@ -1542,7 +1542,7 @@
     </field>
     <field name="SignatureLength" number="93" type="LENGTH"/>
     <field name="Signature" number="89" type="DATA"/>
-    <field name="CheckSum" number="10" type="STRING" length="3"/>
+    <field name="CheckSum" number="10" type="INT" />
     <field name="ListID" number="66" type="STRING"/>
     <field name="BidType" number="394" type="INT">
       <value enum="3" description="NOBID"/>
@@ -1898,7 +1898,7 @@
       <value enum="16" description="INCORRECT_NUMINGROUP_COUNT_FOR_REPEATING_GROUP"/>
       <value enum="13" description="TAGAPPEARSMORETHANONCE"/>
       <value enum="14" description="TAGSPECIFIEDOUTOFREQUIREDORDER"/>
-      <value enum="11" description="INVALIDMSGTYPE"/>
+      <value enum="11" description="INVALID_MSGTYPE"/>
       <value enum="12" description="XMLVALIDATIONERROR"/>
       <value enum="3" description="UNDEFINED_TAG"/>
       <value enum="2" description="TAGNOTDEFINEDFORTHISMESSAGETYPE"/>
