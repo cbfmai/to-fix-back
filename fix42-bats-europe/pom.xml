@@ -7,7 +7,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>fix42nordic</artifactId>
+    <artifactId>fix42-bats-europe</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -30,7 +30,7 @@
                 <groupId>org.tomac</groupId>
                 <artifactId>generator-maven-plugin</artifactId>
                 <configuration>
-	                <fixspecfile>${project.basedir}/src/main/xml/FIX42Nordic.xml</fixspecfile>
+	                <fixspecfile>${project.basedir}/xml/FIX42BatsEurope.xml</fixspecfile>
                 </configuration>
             </plugin>
         </plugins>
