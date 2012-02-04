@@ -92,7 +92,15 @@
 		<module>generator</module>
 		<module>fix</module>
 		<module>fix50sp2</module>
+		<module>fix50-lse-order</module>
+		<module>fix50-lse-trade</module>
+		<module>fix44-nasdaq-nordic</module>
 		<module>fix42nordic</module>
+		<module>fix42-bats-europe</module>
+		<module>fix42-chieast</module>
+		<module>fix42-chix-europe</module>
+		<module>fix42-chix-japan</module>
+		<module>fix42-sigmax-mtf</module>
 		<module>performance-test</module>
   </modules>
 </project>

@@ -30,7 +30,7 @@
                 <groupId>org.tomac</groupId>
                 <artifactId>generator-maven-plugin</artifactId>
                 <configuration>
-	                <fixspecfile>${project.basedir}/../repository/FIX50SP2.xml</fixspecfile>
+	                <fixspecfile>${project.basedir}/src/xml/FIX50SP2.xml</fixspecfile>
                 </configuration>
             </plugin>
         </plugins>
