@@ -1,9 +1,16 @@
 package org.tomac.protocol.fix.fix50sp2;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.tomac.protocol.fix.messaging.*;
 
 public class FixMessageListenerTest implements FixMessageListener {
 	FixMessage outMsg;
+
+        @Ignore
+        @Test
+        public void testDummeBecauseSurefireOrIamStupid() {}
+
 
 	@Override
 	public void onUnknownMessageType(FixMessage msg) {
