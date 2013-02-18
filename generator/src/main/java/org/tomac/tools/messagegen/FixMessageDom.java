@@ -33,7 +33,7 @@ public class FixMessageDom {
 	public static final int	TAGNUM				= 12;
 	public static final int	SEQNUM				= 13;
 	public static final int	NUMINGROUP			= 14;
-	public static final int	DAYOFMOUNTH			= 15;
+	public static final int	DAYOFMONTH			= 15;
 	public static final int	FLOAT				= 2;
 	public static final int	PRICE				= 21;
 	public static final int	QTY					= 22;
@@ -72,8 +72,8 @@ public class FixMessageDom {
 			return NUMINGROUP;
 		if (type.equals("NUMINGRP"))
 			return NUMINGROUP; // <field name="NoRiskSecurityAltID" number="1540" type="NUMINGRP"/> fixprotocol.org bug
-		if (type.equals("DAYOFMOUNTH"))
-			return DAYOFMOUNTH;
+		if (type.equals("DAYOFMONTH"))
+			return DAYOFMONTH;
 		if (type.equals("FLOAT"))
 			return FLOAT;
 		if (type.equals("PRICE"))
@@ -92,9 +92,9 @@ public class FixMessageDom {
 			return BOOLEAN;
 		if (type.equals("STRING"))
 			return STRING;
-		if (type.equals("MULTIPLECHARVALUE"))
+		if (type.equals("MULTIPLECHARVALUE") || type.equals("MULTIPLEVALUECHAR"))
 			return MULTIPLECHARVALUE;
-		if (type.equals("MULTIPLESTRINGVALUE"))
+		if (type.equals("MULTIPLESTRINGVALUE") || type.equals("MULTIPLEVALUESTRING"))
 			return MULTIPLESTRINGVALUE;
 		if (type.equals("COUNTRY"))
 			return COUNTRY;
